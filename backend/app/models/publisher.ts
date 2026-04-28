@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany, HasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import Book from './book.js'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 
 export default class Publisher extends BaseModel {
   @column({ isPrimary: true })
