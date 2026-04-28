@@ -6,6 +6,14 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
+      table.tinyint('rating').notNullable().checkBetween([0, 5])
+      table.text('comment').nullable()
+
+      table.integer('book_id').notNullable().unsigned()
+      table.integer('user_id').notNullable().unsigned()
+
+      table.foreign('book_id').references('id').inTable('books').onDelete('CASCADE')
+      table.foreign('user_id').references('id').inTable('users').onDelete('CASCADE')
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
