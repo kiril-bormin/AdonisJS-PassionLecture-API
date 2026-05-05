@@ -10,8 +10,13 @@
 import router from '@adonisjs/core/services/router'
 import BooksController from '#controllers/books_controller'
 
+import { middleware } from '#start/kernel'
+
 router.group(() => {
-  router.resource('books', 'BooksController').apiOnly()
+  router.resource('books', 'BooksController').apiOnly().use(
+    ['store', 'update', 'destroy'],
+    middleware.auth()
+  )
   router.resource('authors', 'AuthorsController').apiOnly()
   router.resource('categories', 'CategoriesController').apiOnly()
   router.resource('publishers', 'PublishersController').apiOnly()
