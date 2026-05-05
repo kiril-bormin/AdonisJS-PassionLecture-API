@@ -47,28 +47,18 @@ export default class Book extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @belongsTo(() => Category, {
-    foreignKey: 'category_id',
-  })
+  @belongsTo(() => Category)
   declare category: BelongsTo<typeof Category>
 
-  @belongsTo(() => Author, {
-    foreignKey: 'author_id',
-  })
+  @belongsTo(() => Author)
   declare author: BelongsTo<typeof Author>
 
-  @belongsTo(() => Publisher, {
-    foreignKey: 'publisher_id',
-  })
+  @belongsTo(() => Publisher)
   declare publisher: BelongsTo<typeof Publisher>
 
-  @belongsTo(() => User, {
-    foreignKey: 'user_id',
-  })
+  @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 
-  @hasMany(() => Review, {
-    foreignKey: 'book_id',
-  })
+  @hasMany(() => Review)
   declare reviews: HasMany<typeof Review>
 }

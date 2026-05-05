@@ -5,7 +5,7 @@ import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Book from './book.js'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Review from './review.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
@@ -35,14 +35,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
-  @hasMany(() => Book, {
-    foreignKey: 'user_id',
-  })
+  @hasMany(() => Book)
   declare books: HasMany<typeof Book>
 
-  @hasMany(() => Review, {
-    foreignKey: 'user_id',
-  })
+  @hasMany(() => Review)
   declare reviews: HasMany<typeof Review>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
