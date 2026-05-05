@@ -35,7 +35,7 @@
     </div>
     <div v-if="loading">Chargement...</div>
     <div v-else class="book-list">
-      <div v-for="book in filteredBooks" :key="book.id" class="book-card">
+      <div v-for="book in books" :key="book.id" class="book-card">
         <router-link :to="{ name: 'BookDetails', params: { id: book.id } }">
           <!-- faire l'objet cliquable -->
           <img :src="book.coverImage || 'default-cover.jpg'" alt="Couverture" />
@@ -43,64 +43,68 @@
             <h3>{{ book.title }}</h3>
             <p><strong>Année :</strong> {{ book.publishYear }}</p>
             <p><strong>Catégorie :</strong> {{ book.category }}</p>
-            <p><strong>Description :</strong> {{ book.summary }}</p>
-            <p class="added-book"><strong>Ajouté le :</strong> {{ book.added }}</p>
+            <p><strong>Description :</strong> {{ book.description }}</p>
+            <p class="added-book">
+              <strong>Ajouté le :</strong>
+              {{ book.createdAt ? new Date(book.createdAt).toLocaleDateString() : '' }}
+            </p>
           </div>
         </router-link>
       </div>
+    </div>
+    <div class="pagination" v-if="meta && meta.lastPage > 1">
+      <button :disabled="meta.currentPage === 1" @click="goTo(meta.currentPage - 1)">
+        Précédent
+      </button>
+
+      <button
+        v-for="p in meta.lastPage"
+        :key="p"
+        :class="{ active: p === meta.currentPage }"
+        @click="goTo(p)"
+      >
+        {{ p }}
+      </button>
+
+      <button :disabled="meta.currentPage === meta.lastPage" @click="goTo(meta.currentPage + 1)">
+        Suivant
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { getBooks } from '@/composables/getBooks'
 
-const { books, loading, fetchBooks } = getBooks()
-
-const searchQuery = ref('') // valeur qui est dans l'input de recherche
-const activeSearch = ref('') // valeur qui est appliquée pour filtrer les livres
-
+const { books, loading, meta, fetchBooks } = getBooks()
+const page = ref(1)
+const searchQuery = ref('')
+const activeSearch = ref('')
 const selectedCategory = ref('')
 const sortOption = ref('addedDesc')
 
-const categories = computed(() => {
-  if (!books.value) return []
-  const allCats = books.value.map((b) => b.category)
-  return [...new Set(allCats)]
-})
+// TODO: fetch real categories from the API later
+const categories = ref(['Science-Fiction', 'Fantasy', 'Policier', 'Romance', 'Historique'])
 
-const filteredBooks = computed(() => {
-  return books.value
-    .filter((book) => {
-      const matchesSearch = book.title.toLowerCase().includes(activeSearch.value.toLowerCase())
-      const matchesCategory =
-        selectedCategory.value === '' || book.category === selectedCategory.value
-      return matchesSearch && matchesCategory
-    })
-    .sort((a, b) => {
-      switch (sortOption.value) {
-        case 'title':
-          return a.title.localeCompare(b.title) // compare les titres des livres deux par deux
-        case 'titleDesc':
-          return b.title.localeCompare(a.title)
-        case 'year':
-          return a.publishYear - b.publishYear // fait un calcul et si retourne un nombre négatif -> a avant b
-        case 'yearDesc':
-          return b.publishYear - a.publishYear
-        case 'added':
-          return a.added - b.added
-        case 'addedDesc':
-        default:
-          return new Date(b.added) - new Date(a.added)
-      }
-    })
-})
-const applySearch = () => {
-  activeSearch.value = searchQuery.value
+const load = () => {
+  fetchBooks({ page: page.value, search: activeSearch.value, category: selectedCategory.value })
 }
 
-onMounted(fetchBooks)
+const applySearch = () => {
+  activeSearch.value = searchQuery.value
+  page.value = 1 // Reset page on new search
+  load()
+}
+
+watch([page, selectedCategory], () => load())
+onMounted(load)
+
+function goTo(p) {
+  if (p < 1) p = 1
+  if (meta.value && p > meta.value.lastPage) p = meta.value.lastPage
+  page.value = p
+}
 </script>
 
 <style scoped>
