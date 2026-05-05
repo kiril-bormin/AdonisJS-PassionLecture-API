@@ -7,8 +7,8 @@ export default function mapBook(b) {
     description: b.summary || '',
     excerpt: b.extractUrl || null,
     category: b.category?.label || '',
-    author: b.author ? `${b.author.firstname} ${b.author.lastname}` : '',
-    userId: b.user_id ?? b.userId ?? null,
+    author: b.author ? `${b.author.firstName} ${b.author.lastName}` : '',
+    userId: b.userId ?? null,
     reviews: (b.reviews || []).map((r) => ({
       id: r.id,
       rating: r.rating,
