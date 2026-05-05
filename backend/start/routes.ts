@@ -12,4 +12,9 @@ import BooksController from '#controllers/books_controller'
 
 router.group(() => {
   router.resource('books', 'BooksController').apiOnly()
-})
+  router.resource('authors', 'AuthorsController').apiOnly()
+  router.resource('categories', 'CategoriesController').apiOnly()
+  router.resource('publishers', 'PublishersController').apiOnly()
+  router.resource('reviews', 'ReviewsController').apiOnly()
+  router.resource('users', 'UsersController').apiOnly()
+}).prefix('/api')
